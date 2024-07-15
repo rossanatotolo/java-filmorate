@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
+import jakarta.validation.constraints.Size;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.annotation.DateReleaseValidation;
 
 import java.time.LocalDate;
 
@@ -12,12 +14,13 @@ import java.time.LocalDate;
  */
 @Data
 public class Film {
-    Long id;
+    private Long id;
     @NotBlank(message = "Фильм должен быть указан")
-    String name; //название фильма
-    @NotBlank(message = "Описание должно быть указано")
-    String description; //описание фильма
-    LocalDate releaseDate; // дата релиза
+    private String name; //название фильма
+    @Size(max = 200, message = "Максимальная длина описания - 200 символов")
+    private String description; //описание фильма
+    @DateReleaseValidation
+    private LocalDate releaseDate; // дата релиза
     @Min(value = 0, message = "Продолжительность фильма должна быть положительным числом")
-    Long duration; //продолжительность фильма
+    private Long duration; //продолжительность фильма
 }

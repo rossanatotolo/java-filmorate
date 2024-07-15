@@ -29,7 +29,7 @@ public class UserController {
     public User userCreate(@Valid @RequestBody User user) { // значение, которое будет передано в метод в качестве аргумента, нужно взять из тела запроса
         log.info("Поступил Post запрос /users с телом {}", user);
         if (users.containsValue(user)) {
-            log.info("Пользователь уже добавлен в список");
+            log.warn("Пользователь уже добавлен в список");
             throw new DuplicatedDataException("Этот пользователь уже существует");
         }
         userValidate(user);
@@ -38,6 +38,20 @@ public class UserController {
         // сохраняем нового пользователя в памяти приложения
         users.put(user.getId(), user);
         log.info("Отправлен ответ Post /users с телом {}", user);
+        return user;
+    }
+
+    @PutMapping() //для обновления данных существующего пользователя.
+    public User userUpdate(@Valid @RequestBody User user) {
+        if (user.getId() == null || !users.containsKey(user.getId())) {
+            log.warn("Пользователь с id {} не найден", user.getId());
+            throw new NotFoundException("Пользователь с id: " + user.getId() + " не найден");
+        }
+
+        userValidate(user);
+        log.info("Поступил Put запрос /users с телом {}", user);
+        users.put(user.getId(), user);
+        log.info("Отправлен ответ Put /users с телом {}", user);
         return user;
     }
 
@@ -51,28 +65,9 @@ public class UserController {
         return ++currentMaxId;
     }
 
-    @PutMapping() //для обновления данных существующего пользователя.
-    public User userUpdate(@Valid @RequestBody User user) {
-        if (user.getId() == null || !users.containsKey(user.getId())) {
-            log.info("Пользователь с id {} не найден", user.getId());
-            throw new NotFoundException("Пользователь с id: " + user.getId() + " не найден");
-        }
-
-        userValidate(user);
-        log.info("Поступил Put запрос /users с телом {}", user);
-        users.put(user.getId(), user);
-        log.info("Отправлен ответ Put /users с телом {}", user);
-        return user;
-    }
-
     private void userValidate(User user) {
-        if (!user.getEmail().contains("@")) {
-            log.info("Ошибка в написании имейла");
-            throw new ValidationException("Имейл должен содержать символ «@». Формат имейла: example@mail.com");
-        }
-
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Ошибка в написании даты рождения");
+            log.warn("Ошибка в написании даты рождения");
             throw new ValidationException("Дата рождения не может быть задана в будущем");
         }
 

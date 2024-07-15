@@ -134,14 +134,14 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Проверка на валидацию фильма с некорректной датой релиза")
-    void shouldValidationFilmForIncorrectReleaseDate() {
-        film.setName("Гарри Поттер и Кубок огня");
-        film.setDescription("Гарри Поттер, Рон и Гермиона возвращаются на четвёртый курс школы чародейства и волшебства Хогвартс.");
-        film.setReleaseDate(LocalDate.of(1500, 11, 6));
-        film.setDuration(157L);
-        assertThrows(ValidationException.class, () -> {
-            filmController.filmCreate(film);
-        });
+    void shouldValidationFilmForIncorrectReleaseDate() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Гарри Поттер и Кубок огня.\","
+                                + "\"description\":\"Гарри Поттер, Рон и Гермиона возвращаются на четвёртый курс школы чародейства и волшебства Хогвартс.\","
+                                + "\"releaseDate\":\"1500-11-6\",\"duration\":157}"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
