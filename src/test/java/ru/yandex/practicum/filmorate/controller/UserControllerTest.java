@@ -170,7 +170,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Проверка на валидацию дня рождения пользователя")
-    void shouldValidationTheBirthdayUser() throws Exception {
+    void shouldValidationTheBirthdayUser() {
         user.setEmail("example@yandex.ru");
         user.setLogin("Chosya");
         user.setName("Chosik");
