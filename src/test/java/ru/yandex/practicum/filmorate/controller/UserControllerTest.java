@@ -11,11 +11,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -26,19 +27,14 @@ class UserControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        userController = new UserController();
-        user = new User();
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserController()).build();
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
+        user = createUserChosya();
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
     @DisplayName("Проверка на добавление пользователя")
     void shouldAddUser() {
-        user.setEmail("example@yandex.ru");
-        user.setLogin("Chosya");
-        user.setName("Chosik");
-        user.setBirthday(LocalDate.of(2020, 7, 1));
-
         userController.userCreate(user);
         assertEquals(user.getId(), 1, "Пользователь не добавлен");
     }
@@ -47,10 +43,6 @@ class UserControllerTest {
     @DisplayName("Проверка на пустой id у пользователя")
     void shouldIUserIsEmpty() {
         user.setId(null);
-        user.setEmail("example@yandex.ru");
-        user.setLogin("Chosya");
-        user.setName("Chosik");
-        user.setBirthday(LocalDate.of(2020, 7, 1));
 
         assertThrows(NotFoundException.class, () -> {
             userController.userUpdate(user);
@@ -60,50 +52,21 @@ class UserControllerTest {
     @Test
     @DisplayName("Проверка на обновление пользователя")
     void shouldUpdateUser() {
-        user.setEmail("example@yandex.ru");
-        user.setLogin("Chosya");
-        user.setName("Chosik");
-        user.setBirthday(LocalDate.of(2020, 7, 1));
-
         userController.userCreate(user);
+        User userUpdate = createUserChycha();
+        userUpdate.setId(1L);
+        userController.userUpdate(userUpdate);
 
-        User user1 = new User();
-        user1.setEmail("Newexample@yandex.ru");
-        user1.setLogin("Chycha");
-        user1.setName("Chychhela");
-        user1.setBirthday(LocalDate.of(2020, 1, 7));
-        user1.setId(1L);
-
-        userController.userUpdate(user1);
-        assertEquals(user1.getEmail(), "Newexample@yandex.ru", "Пользователь не обновлен");
+        assertEquals(userUpdate.getEmail(), "Newexample@yandex.ru", "Пользователь не обновлен");
         assertEquals(userController.getAllUsers().size(), 1, "Количество пользователей не совпадает");
     }
 
     @Test
     @DisplayName("Проверка получение списка пользователей")
     void shouldGetAllUsers() {
-        user.setEmail("example@yandex.ru");
-        user.setLogin("Chosya");
-        user.setName("Chosik");
-        user.setBirthday(LocalDate.of(2020, 7, 1));
-
         userController.userCreate(user);
-
-        User user1 = new User();
-        user1.setEmail("Newexample@yandex.ru");
-        user1.setLogin("Chycha");
-        user1.setName("Chychhela");
-        user1.setBirthday(LocalDate.of(2020, 1, 7));
-
-        userController.userCreate(user1);
-
-        User user2 = new User();
-        user2.setEmail("2Newexample@yandex2.ru");
-        user2.setLogin("Bocha");
-        user2.setName("Bochka");
-        user2.setBirthday(LocalDate.of(2015, 4, 10));
-
-        userController.userCreate(user2);
+        userController.userCreate(createUserChycha());
+        userController.userCreate(createUserBocha());
 
         assertEquals(userController.getAllUsers().size(), 3, "Количество пользователей не совпадает");
     }
@@ -157,27 +120,58 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Проверка на валидацию логина с пробелами")
+    void shouldValidationForUserLoginWithSpaces() {
+        user.setLogin("Cho sya");
+
+        assertThrows(ValidationException.class, () -> {
+            userController.userCreate(user);
+        });
+    }
+
+    @Test
     @DisplayName("Проверка на валидацию имени пользователя")
     void shouldValidationForUserName() {
-        user.setEmail("example@yandex.ru");
-        user.setLogin("Chosya");
         user.setName("");
-        user.setBirthday(LocalDate.of(2020, 7, 1));
-
         userController.userCreate(user);
+
         assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
     @DisplayName("Проверка на валидацию дня рождения пользователя")
     void shouldValidationTheBirthdayUser() {
-        user.setEmail("example@yandex.ru");
-        user.setLogin("Chosya");
-        user.setName("Chosik");
         user.setBirthday(LocalDate.of(2050, 7, 1));
 
         assertThrows(ValidationException.class, () -> {
             userController.userCreate(user);
         });
+    }
+
+    private User createUserChosya() {
+        User user = new User();
+        user.setEmail("example@yandex.ru");
+        user.setLogin("Chosya");
+        user.setName("Chosik");
+        user.setBirthday(LocalDate.of(2020, 7, 1));
+        return user;
+    }
+
+    private User createUserChycha() {
+        User user = new User();
+        user.setEmail("Newexample@yandex.ru");
+        user.setLogin("Chycha");
+        user.setName("Chychhela");
+        user.setBirthday(LocalDate.of(2020, 1, 7));
+        return user;
+    }
+
+    private User createUserBocha() {
+        User user = new User();
+        user.setEmail("2Newexample@yandex2.ru");
+        user.setLogin("Bocha");
+        user.setName("Bochka");
+        user.setBirthday(LocalDate.of(2015, 4, 10));
+        return user;
     }
 }
