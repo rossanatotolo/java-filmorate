@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
-    private long Id = 0;
+    private long currentId = 0;
 
     @Override //получение списка пользователей.
     public Collection<User> getAllUsers() {
@@ -66,6 +66,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     private long getIdNext() {
-        return ++Id;
+        return ++currentId;
     }
 }

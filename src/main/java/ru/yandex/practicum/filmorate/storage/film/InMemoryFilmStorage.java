@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
-    private long Id = 0;
+    private long currentId = 0;
 
     @Override   //получение списка фильмов
     public Collection<Film> getAllFilms() {
@@ -55,6 +55,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private long getIdNext() {
-        return ++Id;
+        return ++currentId;
     }
 }
