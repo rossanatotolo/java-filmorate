@@ -13,41 +13,41 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override   //получение списка фильмов
     public Collection<Film> getAllFilms() {
-        return films.values();
+        return new ArrayList<>(films.values());
     }
 
     @Override // для добавления нового фильма в список.
-    public Film filmCreate(Film film) {
+    public Film filmCreate(final Film film) {
         film.setId(getIdNext());
         films.put(film.getId(), film);
         return film;
     }
 
     @Override //для обновления данных существующего фильма.
-    public Film filmUpdate(Film film) {
+    public Film filmUpdate(final Film film) {
         films.put(film.getId(), film);
         return film;
     }
 
-    @Override
-    public Map<Long, Film> getFilms() {
-        return films;
+    @Override //получение фильма по id
+    public Optional<Film> getFilmById(final Long id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override //добавление лайка
-    public Set<Long> addLike(Long id, Long idUser) {
+    public Set<Long> addLike(final Long id, final Long idUser) {
         films.get(id).getLikes().add(idUser);
         return films.get(id).getLikes();
     }
 
     @Override // удаление лайка
-    public Set<Long> deleteLike(Long id, Long idUser) {
+    public Set<Long> deleteLike(final Long id, final Long idUser) {
         films.get(id).getLikes().remove(idUser);
         return films.get(id).getLikes();
     }
 
     @Override // получение списка лучших фильмов
-    public List<Film> getPopular(Long count) {
+    public List<Film> getPopular(final Long count) {
         return films.values().stream()
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size()).reversed())
                 .limit(count)

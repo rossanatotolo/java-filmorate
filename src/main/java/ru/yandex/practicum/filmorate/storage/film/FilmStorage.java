@@ -2,10 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface FilmStorage {
     Collection<Film> getAllFilms(); // получение списка всех фильмов
@@ -14,7 +11,7 @@ public interface FilmStorage {
 
     Film filmUpdate(Film film); //обновление фильма
 
-    Map<Long, Film> getFilms(); //получение доступа к хранилищу с фильмами
+    Optional<Film> getFilmById(Long id); //получение фильма по id
 
     Set<Long> addLike(Long id, Long idUser); //добавление лайка
 

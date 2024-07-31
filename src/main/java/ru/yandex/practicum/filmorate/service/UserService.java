@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -19,108 +18,87 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserService {
 
-    private UserStorage userStorage;
+    private final UserStorage userStorage;
 
     public Collection<User> getAllUsers() { //получение списка пользователей.
         log.info("Получение списка всех пользователей");
         return userStorage.getAllUsers();
     }
 
-    public User userCreate(User user) { // для добавления нового пользователя в список.
-        if (userStorage.getUsers().containsValue(user)) {
+    public User userCreate(final User user) { // для добавления нового пользователя в список.
+        if (userStorage.getAllUsers().contains(user)) {
             log.warn("Пользователь с id {} уже добавлен в список.", user.getId());
             throw new DuplicatedDataException("Этот пользователь уже существует.");
         }
         userValidate(user);
+        User user1 = userStorage.userCreate(user);
         log.info("Пользователь с id {} добавлен.", user.getId());
-        return userStorage.userCreate(user);
+        return user1;
     }
 
-    public User userUpdate(User user) { //для обновления данных существующего пользователя.
-        if (user.getId() == null || !userStorage.getUsers().containsKey(user.getId())) {
+    public User userUpdate(final User user) { //для обновления данных существующего пользователя.
+        if (user.getId() == null || userStorage.getUserById(user.getId()).isEmpty()) {
             log.warn("Пользователь с id {} не найден.", user.getId());
             throw new NotFoundException("Пользователь с id: " + user.getId() + " не найден.");
         }
         userValidate(user);
+        User user1 = userStorage.userUpdate(user);
         log.info("Пользователь с id {} обновлен.", user.getId());
-        return userStorage.userUpdate(user);
+        return user1;
     }
 
-    public Set<Long> addNewFriend(Long idUser, Long idFriend) { //добавление пользователя в друзья
-        if (!userStorage.getUsers().containsKey(idUser)) {
-            log.warn("Ошибка при добавлении в друзья. Пользователь с id {} не найден.", idUser);
-            throw new NotFoundException("Ошибка при добавлении в друзья. Пользователь с id: " + idUser + " не найден.");
-        }
-        if (!userStorage.getUsers().containsKey(idFriend)) {
-            log.warn("Ошибка при добавлении в друзья. Пользователь с id {} не найден.", idFriend);
-            throw new NotFoundException("Ошибка при добавлении в друзья. Пользователь с id: " + idFriend + " не найден.");
-        }
-        if (userStorage.getUsers().get(idUser).getFriends().contains(idFriend) || userStorage.getUsers().get(idFriend).getFriends().contains(idUser)) {
-            log.warn("Ошибка при добавлении в друзья. Пользователь уже в друзьях.");
-            throw new ValidationException("Ошибка при добавлении в друзья. Пользователь уже в друзьях.");
-        }
+    public User getUserById(final Long id) { // получение пользователя по id
+        log.info("Получение пользователя по id.");
+        return userStorage.getUserById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + id + " не найден."));
+    }
+
+    public Set<Long> addNewFriend(final Long idUser, final Long idFriend) { //добавление пользователя в друзья
+        getUserById(idUser);
+        getUserById(idFriend);
         if (idUser.equals(idFriend)) {
             log.warn("Ошибка при добавлении в друзья. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при добавлении в друзья. Id пользователей совпадают.");
         }
+        Set<Long> setFriends = userStorage.addNewFriend(idUser, idFriend);
         log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}.", idFriend, idUser);
-        return userStorage.addNewFriend(idUser, idFriend);
+        return setFriends;
     }
 
-    public Set<Long> deleteFriend(Long idUser, Long idFriend) { // удаление из друзей пользователя
-        if (!userStorage.getUsers().containsKey(idUser)) {
-            log.warn("Ошибка при удалении пользователя из друзей. Пользователь с id {} не найден.", idUser);
-            throw new NotFoundException("Ошибка при удалении пользователя из друзей. Пользователь с id: " + idUser + " не найден.");
-        }
-        if (!userStorage.getUsers().containsKey(idFriend)) {
-            log.warn("Ошибка при удалении пользователя из друзей. Пользователь с id {} не найден.", idFriend);
-            throw new NotFoundException("Ошибка при удалении пользователя из друзей. Пользователь с id: " + idFriend + " не найден.");
-        }
+    public Set<Long> deleteFriend(final Long idUser, final Long idFriend) { // удаление из друзей пользователя
+        getUserById(idUser);
+        getUserById(idFriend);
         if (idUser.equals(idFriend)) {
             log.warn("Ошибка при удалении пользователя из друзей. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при удалении пользователя из друзей. Id пользователей совпадают.");
         }
+        Set<Long> setFriends = userStorage.deleteFriend(idUser, idFriend);
         log.info("Пользователь с id {} удален из друзей пользователя с id {}.", idFriend, idUser);
-        return userStorage.deleteFriend(idUser, idFriend);
+        return setFriends;
     }
 
-    public List<User> getAllFriends(Long idUser) { // получение списка друзей пользователя
-        if (!userStorage.getUsers().containsKey(idUser)) {
-            log.warn("Ошибка получения списка друзей пользователя. Пользователь с id {} не найден.", idUser);
-            throw new NotFoundException("Ошибка получения списка друзей пользователя. Пользователь с id: " + idUser + " не найден.");
-        }
+    public List<User> getAllFriends(final Long idUser) { // получение списка друзей пользователя
+        getUserById(idUser);
+        List<User> listFriends = userStorage.getAllFriends(idUser);
         log.info("Получение списка друзей пользователя с id {}.", idUser);
-        return userStorage.getAllFriends(idUser);
+        return listFriends;
     }
 
-    public List<User> getCommonFriends(Long idUser, Long idOther) { // получение списка общих друзей с пользователем
-        if (!userStorage.getUsers().containsKey(idUser)) {
-            log.warn("Ошибка при получении списка общих друзей. Пользователь с id {} не найден.", idUser);
-            throw new NotFoundException("Ошибка при получении списка общих друзей. Пользователь с id: " + idUser + " не найден.");
-        }
-        if (!userStorage.getUsers().containsKey(idOther)) {
-            log.warn("Ошибка при получении списка общих друзей. Пользователь с id {} не найден.", idOther);
-            throw new NotFoundException("Ошибка при получении списка общих друзей. Пользователь с id: " + idOther + " не найден.");
-        }
+    public List<User> getCommonFriends(final Long idUser, final Long idOther) { // получение списка общих друзей с пользователем
+        getUserById(idUser);
+        getUserById(idOther);
         if (idUser.equals(idOther)) {
             log.warn("Ошибка при получении списка общих друзей. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при получении списка общих друзей. Id пользователей совпадают.");
         }
+        List<User> listFriends = userStorage.getCommonFriends(idUser, idOther);
         log.info("Получение списка общих друзей у пользователя с id {} и пользователя с id {}.", idOther, idUser);
-        return userStorage.getCommonFriends(idUser, idOther);
+        return listFriends;
     }
 
-    private void userValidate(User user) {
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Ошибка в написании даты рождения.");
-            throw new ValidationException("Дата рождения не может быть задана в будущем.");
-        }
+    private void userValidate(final User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
-        }
-        if (user.getLogin().contains(" ")) {
-            log.warn("Ошибка в написании логина.");
-            throw new ValidationException("Логин не должен содержать пробелы.");
         }
     }
 }

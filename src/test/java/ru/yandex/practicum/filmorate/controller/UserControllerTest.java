@@ -9,7 +9,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
@@ -121,12 +120,14 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Проверка на валидацию логина с пробелами")
-    void shouldValidationForUserLoginWithSpaces() {
-        user.setLogin("Cho sya");
-
-        assertThrows(ValidationException.class, () -> {
-            userController.userCreate(user);
-        });
+    void shouldValidationForUserLoginWithSpaces() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"example@yandex.ru\","
+                                + "\"login\":\"Cho sya\","
+                                + "\"name\":\"Chosik\",\"birthday\":\"2020-07-1\"}"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -140,12 +141,14 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Проверка на валидацию дня рождения пользователя")
-    void shouldValidationTheBirthdayUser() {
-        user.setBirthday(LocalDate.of(2050, 7, 1));
-
-        assertThrows(ValidationException.class, () -> {
-            userController.userCreate(user);
-        });
+    void shouldValidationTheBirthdayUser() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"example@yandex.ru\","
+                                + "\"login\":\"Chosya\","
+                                + "\"name\":\"Chosik\",\"birthday\":\"2050-07-1\"}"))
+                .andExpect(status().isBadRequest());
     }
 
     private User createUserChosya() {

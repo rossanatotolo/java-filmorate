@@ -4,7 +4,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface UserStorage {
@@ -14,7 +14,7 @@ public interface UserStorage {
 
     User userUpdate(User user); //для обновления данных существующего пользователя
 
-    Map<Long, User> getUsers(); //получение доступа к хранилищу с пользователями
+    Optional<User> getUserById(Long id); //получение пользователя по id
 
     Set<Long> addNewFriend(Long idUser, Long idFriend); //добавление пользователя в друзья
 

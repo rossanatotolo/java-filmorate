@@ -8,16 +8,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -28,7 +27,7 @@ class FilmControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
+        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new UserService(new InMemoryUserStorage())));
         film = createHarryPotterAndGobletOfFire();
         mockMvc = MockMvcBuilders.standaloneSetup(filmController).build();
     }
@@ -42,12 +41,17 @@ class FilmControllerTest {
 
     @Test
     @DisplayName("Проверка на пустой id у фильма")
-    void shouldIdFilmIsEmpty() {
+    void shouldIdFilmIsEmpty() throws Exception {
         film.setId(null);
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Гарри Поттер и Кубок огня.\","
+                                + "\"description\":\"Гарри Поттер, Рон и Гермиона возвращаются на четвёртый курс школы чародейства и волшебства Хогвартс.\","
+                                + "\"releaseDate\":\"2005-11-6\",\"duration\":-157}"))
+                .andExpect(status().isBadRequest());
 
-        assertThrows(NotFoundException.class, () -> {
-            filmController.filmUpdate(film);
-        });
+
     }
 
     @Test
