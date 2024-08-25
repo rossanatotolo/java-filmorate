@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -11,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 @RestController
 @RequestMapping("/films")
@@ -37,22 +36,22 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable @Positive @RequestBody final Long id) {
+    public Film getFilmById(@PathVariable @Positive @RequestBody final int id) {
         return filmService.getFilmById(id);
     }
 
     @PutMapping("/{id}/like/{userId}") //добавление лайка
-    public Set<Long> addLike(@PathVariable @Positive final Long id, @PathVariable("userId") @Positive final Long idUser) {
-        return filmService.addLike(id, idUser);
+    public void addLike(@PathVariable @Positive final int id, @PathVariable("userId") @Positive final int idUser) {
+        filmService.addLike(id, idUser);
     }
 
     @DeleteMapping("/{id}/like/{userId}") //удаление лайка
-    public Set<Long> deleteLike(@PathVariable @Positive final Long id, @PathVariable("userId") @Positive final Long idUser) {
-        return filmService.deleteLike(id, idUser);
+    public void deleteLike(@PathVariable @Positive final int id, @PathVariable("userId") @Positive final int idUser) {
+        filmService.deleteLike(id, idUser);
     }
 
     @GetMapping("/popular")  // получение списка лучших фильмов
-    public List<Film> getPopular(@RequestParam(defaultValue = "10") @Positive final Long count) {
+    public List<Film> getPopular(@RequestParam(defaultValue = "10") @Positive final int count) {
         return filmService.getPopular(count);
     }
 }
