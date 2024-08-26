@@ -57,47 +57,47 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addNewFriend(final int idUser, final int idFriend) { //добавление пользователя в друзья
-        getUserById(idUser);
-        getUserById(idFriend);
-        if (idUser == idFriend) {
+    public void addNewFriend(final int userId, final int friendId) { //добавление пользователя в друзья
+        getUserById(userId);
+        getUserById(friendId);
+        if (userId == friendId) {
             log.warn("Ошибка при добавлении в друзья. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при добавлении в друзья. Id пользователей совпадают.");
         }
-        userStorage.addNewFriend(idUser, idFriend);
-        log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}.", idFriend, idUser);
+        userStorage.addNewFriend(userId, friendId);
+        log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}.", friendId, userId);
     }
 
     @Override
-    public void deleteFriend(final int idUser, final int idFriend) { // удаление из друзей пользователя
-        getUserById(idUser);
-        getUserById(idFriend);
-        if (idUser == idFriend) {
+    public void deleteFriend(final int userId, final int friendId) { // удаление из друзей пользователя
+        getUserById(userId);
+        getUserById(friendId);
+        if (userId == friendId) {
             log.warn("Ошибка при удалении пользователя из друзей. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при удалении пользователя из друзей. Id пользователей совпадают.");
         }
-        userStorage.deleteFriend(idUser, idFriend);
-        log.info("Пользователь с id {} удален из друзей пользователя с id {}.", idFriend, idUser);
+        userStorage.deleteFriend(userId, friendId);
+        log.info("Пользователь с id {} удален из друзей пользователя с id {}.", friendId, userId);
     }
 
     @Override
-    public List<User> getAllFriends(final int idUser) { // получение списка друзей пользователя
-        getUserById(idUser);
-        List<User> listFriends = userStorage.getAllFriends(idUser);
-        log.info("Получение списка друзей пользователя с id {}.", idUser);
+    public List<User> getAllFriends(final int userId) { // получение списка друзей пользователя
+        getUserById(userId);
+        List<User> listFriends = userStorage.getAllFriends(userId);
+        log.info("Получение списка друзей пользователя с id {}.", userId);
         return listFriends;
     }
 
     @Override
-    public List<User> getCommonFriends(final int idUser, final int idOther) { // получение списка общих друзей с пользователем
-        getUserById(idUser);
-        getUserById(idOther);
-        if (idUser == idOther) {
+    public List<User> getCommonFriends(final int userId, final int otherId) { // получение списка общих друзей с пользователем
+        getUserById(userId);
+        getUserById(otherId);
+        if (userId == otherId) {
             log.warn("Ошибка при получении списка общих друзей. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при получении списка общих друзей. Id пользователей совпадают.");
         }
-        List<User> listFriends = userStorage.getCommonFriends(idUser, idOther);
-        log.info("Получение списка общих друзей у пользователя с id {} и пользователя с id {}.", idOther, idUser);
+        List<User> listFriends = userStorage.getCommonFriends(userId, otherId);
+        log.info("Получение списка общих друзей у пользователя с id {} и пользователя с id {}.", otherId, userId);
         return listFriends;
     }
 

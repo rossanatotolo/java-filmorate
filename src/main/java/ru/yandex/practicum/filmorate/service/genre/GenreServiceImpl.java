@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class GenreServiceImp implements GenreService {
+public class GenreServiceImpl implements GenreService {
     private final GenreStorage genreStorage;
 
     @Override

@@ -15,11 +15,11 @@ public interface UserStorage {
 
     Optional<User> getUserById(int id); //получение пользователя по id
 
-    void addNewFriend(int idUser, int idFriend); //добавление пользователя в друзья
+    void addNewFriend(int userId, int friendId); //добавление пользователя в друзья
 
-    void deleteFriend(int idUser, int idFriend); // удаление из друзей пользователя
+    void deleteFriend(int userId, int friendId); // удаление из друзей пользователя
 
-    List<User> getAllFriends(int idUser); // получение списка друзей пользователя
+    List<User> getAllFriends(int userId); // получение списка друзей пользователя
 
-    List<User> getCommonFriends(int idUser, int idOther); // получение списка общих друзей с пользователем
+    List<User> getCommonFriends(int userId, int otherId); // получение списка общих друзей с пользователем
 }

@@ -13,9 +13,9 @@ public interface FilmStorage {
 
     Optional<Film> getFilmById(int id); //получение фильма по id
 
-    void addLike(int id, int idUser); //добавление лайка
+    void addLike(int id, int userId); //добавление лайка
 
-    void deleteLike(int id, int idUser); // удаление лайка
+    void deleteLike(int id, int userId); // удаление лайка
 
     List<Film> getPopular(int count); // получение списка лучших фильмов
 

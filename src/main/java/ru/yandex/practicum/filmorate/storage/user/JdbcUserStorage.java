@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.user.extractor.UsersExtractor;
 import java.util.*;
 
 @Repository
+@Qualifier("jdbcUserStorage")
 @RequiredArgsConstructor
 public class JdbcUserStorage implements UserStorage {
     private final NamedParameterJdbcOperations jdbc;
@@ -75,32 +77,32 @@ public class JdbcUserStorage implements UserStorage {
     }
 
     @Override
-    public void addNewFriend(final int idUser, final int idFriend) { //добавление пользователя в друзья
+    public void addNewFriend(final int userId, final int friendId) { //добавление пользователя в друзья
         String sql = "MERGE INTO friends (user_id, friend_id) " +
                 "VALUES (:user_id, :friend_id); ";
-        jdbc.update(sql, Map.of("user_id", idUser, "friend_id", idFriend));
+        jdbc.update(sql, Map.of("user_id", userId, "friend_id", friendId));
     }
 
     @Override
-    public void deleteFriend(final int idUser, final int idFriend) { // удаление из друзей пользователя
+    public void deleteFriend(final int userId, final int friendId) { // удаление из друзей пользователя
         String sql = "DELETE FROM friends " +
                 "WHERE user_id = :user_id AND friend_id = :friend_id; ";
-        jdbc.update(sql, Map.of("user_id", idUser, "friend_id", idFriend));
+        jdbc.update(sql, Map.of("user_id", userId, "friend_id", friendId));
     }
 
     @Override
-    public List<User> getAllFriends(final int idUser) { // получение списка друзей пользователя
+    public List<User> getAllFriends(final int userId) { // получение списка друзей пользователя
         String sql = "SELECT * " +
                 "FROM users u " +
                 "WHERE user_id IN (SELECT friend_id " +
                 "FROM friends " +
                 "WHERE user_id = :user_id); ";
 
-        return jdbc.query(sql, Map.of("user_id", idUser), usersExtractor);
+        return jdbc.query(sql, Map.of("user_id", userId), usersExtractor);
     }
 
     @Override
-    public List<User> getCommonFriends(final int idUser, final int idOther) { // получение списка общих друзей с пользователем
+    public List<User> getCommonFriends(final int userId, final int otherId) { // получение списка общих друзей с пользователем
         String sql = "SELECT * " +
                 "FROM users " +
                 "WHERE user_id IN (SELECT f.friend_id " +
@@ -111,6 +113,6 @@ public class JdbcUserStorage implements UserStorage {
                 "LEFT JOIN friends fr ON us.user_id = fr.user_id " +
                 "WHERE us.user_id = :other_id));";
 
-        return jdbc.query(sql, Map.of("user_id", idUser, "other_id", idOther), usersExtractor);
+        return jdbc.query(sql, Map.of("user_id", userId, "other_id", otherId), usersExtractor);
     }
 }

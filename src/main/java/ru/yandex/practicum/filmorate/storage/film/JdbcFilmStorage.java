@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -15,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.film.extractor.FilmsExtractor;
 import java.util.*;
 
 @Repository
+@Qualifier("jdbcFilmStorage")
 @RequiredArgsConstructor
 public class JdbcFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -92,15 +94,15 @@ public class JdbcFilmStorage implements FilmStorage {
     }
 
     @Override //добавление лайка
-    public void addLike(final int id, final int idUser) {
+    public void addLike(final int id, final int userId) {
         String sql = "MERGE INTO likes(film_id, user_id) VALUES (:film_id, :user_id); ";
-        jdbc.update(sql, Map.of("film_id", id, "user_id", idUser));
+        jdbc.update(sql, Map.of("film_id", id, "user_id", userId));
     }
 
     @Override // удаление лайка
-    public void deleteLike(final int id, final int idUser) {
+    public void deleteLike(final int id, final int userId) {
         String sql = "DELETE FROM likes WHERE film_id = :film_id AND user_id = :user_id; ";
-        jdbc.update(sql, Map.of("film_id", id, "user_id", idUser));
+        jdbc.update(sql, Map.of("film_id", id, "user_id", userId));
     }
 
     @Override // получение списка лучших фильмов

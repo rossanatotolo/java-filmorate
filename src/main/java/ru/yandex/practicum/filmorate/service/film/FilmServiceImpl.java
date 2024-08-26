@@ -66,23 +66,23 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void addLike(final int id, final int idUser) { //добавление лайка
+    public void addLike(final int id, final int userId) { //добавление лайка
         getFilmById(id);
-        userService.getUserById(idUser);
-        if (filmStorage.getFilmById(id).get().getLikes().contains(idUser)) {
+        userService.getUserById(userId);
+        if (filmStorage.getFilmById(id).get().getLikes().contains(userId)) {
             log.warn("Ошибка при добавлении лайка. Пользователь уже поставил лайк.");
             throw new ValidationException("Ошибка при добавлении лайка. Пользователь уже поставил лайк.");
         }
-        log.info("Пользователь с id {} добавил лайк к фильму с id {}.", idUser, id);
-        filmStorage.addLike(id, idUser);
+        log.info("Пользователь с id {} добавил лайк к фильму с id {}.", userId, id);
+        filmStorage.addLike(id, userId);
     }
 
     @Override
-    public void deleteLike(final int id, final int idUser) { // удаление лайка
+    public void deleteLike(final int id, final int userId) { // удаление лайка
         getFilmById(id);
-        userService.getUserById(idUser);
-        log.info("Пользователь с id {} удалил лайк к фильму с id {}.", idUser, id);
-        filmStorage.deleteLike(id, idUser);
+        userService.getUserById(userId);
+        log.info("Пользователь с id {} удалил лайк к фильму с id {}.", userId, id);
+        filmStorage.deleteLike(id, userId);
 
     }
 

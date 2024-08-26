@@ -41,13 +41,13 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}") //добавление лайка
-    public void addLike(@PathVariable @Positive final int id, @PathVariable("userId") @Positive final int idUser) {
-        filmService.addLike(id, idUser);
+    public void addLike(@PathVariable @Positive final int id, @PathVariable @Positive final int userId) {
+        filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}") //удаление лайка
-    public void deleteLike(@PathVariable @Positive final int id, @PathVariable("userId") @Positive final int idUser) {
-        filmService.deleteLike(id, idUser);
+    public void deleteLike(@PathVariable @Positive final int id, @PathVariable @Positive final int userId) {
+        filmService.deleteLike(id, userId);
     }
 
     @GetMapping("/popular")  // получение списка лучших фильмов
