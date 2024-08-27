@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.RequiredArgsConstructor;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ImportResource;
@@ -22,10 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ImportResource
 @AutoConfigureTestDatabase
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserStorageTest {
     private final UserStorage userStorage;
+
+    @Autowired
+    public UserStorageTest(@Qualifier("jdbcUserStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @Test
     @Order(1)

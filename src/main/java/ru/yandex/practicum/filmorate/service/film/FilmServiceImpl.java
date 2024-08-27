@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -18,12 +18,18 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
+
+    public FilmServiceImpl(@Qualifier("jdbcFilmStorage") FilmStorage filmStorage, UserService userService, GenreStorage genreStorage, MpaStorage mpaStorage) {
+        this.filmStorage = filmStorage;
+        this.userService = userService;
+        this.genreStorage = genreStorage;
+        this.mpaStorage = mpaStorage;
+    }
 
     @Override
     public Collection<Film> getAllFilms() { //   получение списка фильмов

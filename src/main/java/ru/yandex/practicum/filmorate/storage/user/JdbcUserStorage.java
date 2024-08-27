@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.user.extractor.UsersExtractor;
 import java.util.*;
 
 @Repository
-@Qualifier("jdbcUserStorage")
 @RequiredArgsConstructor
 public class JdbcUserStorage implements UserStorage {
     private final NamedParameterJdbcOperations jdbc;

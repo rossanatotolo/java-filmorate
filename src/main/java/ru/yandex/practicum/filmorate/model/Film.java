@@ -30,7 +30,7 @@ public class Film {
     @Positive
     @NotNull
     private int duration;
-    private final Set<Long> likes = new HashSet<>();
+    private final Set<Integer> likes = new HashSet<>();
     @NotNull
     private Mpa mpa;
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>();

@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -16,7 +16,6 @@ import ru.yandex.practicum.filmorate.storage.film.extractor.FilmsExtractor;
 import java.util.*;
 
 @Repository
-@Qualifier("jdbcFilmStorage")
 @RequiredArgsConstructor
 public class JdbcFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;

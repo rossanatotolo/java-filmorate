@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -15,9 +14,12 @@ import java.util.List;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
+
+    public UserServiceImpl(@Qualifier("jdbcUserStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @Override
     public Collection<User> getAllUsers() { //получение списка пользователей.
