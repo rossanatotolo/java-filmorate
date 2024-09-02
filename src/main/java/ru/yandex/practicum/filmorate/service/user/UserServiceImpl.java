@@ -1,7 +1,7 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.user;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -11,20 +11,23 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j
-@AllArgsConstructor
-public class UserService {
-
+public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
+    public UserServiceImpl(@Qualifier("jdbcUserStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
+
+    @Override
     public Collection<User> getAllUsers() { //получение списка пользователей.
         log.info("Получение списка всех пользователей");
         return userStorage.getAllUsers();
     }
 
+    @Override
     public User userCreate(final User user) { // для добавления нового пользователя в список.
         if (userStorage.getAllUsers().contains(user)) {
             log.warn("Пользователь с id {} уже добавлен в список.", user.getId());
@@ -36,6 +39,7 @@ public class UserService {
         return user1;
     }
 
+    @Override
     public User userUpdate(final User user) { //для обновления данных существующего пользователя.
         if (user.getId() == null || userStorage.getUserById(user.getId()).isEmpty()) {
             log.warn("Пользователь с id {} не найден.", user.getId());
@@ -47,52 +51,55 @@ public class UserService {
         return user1;
     }
 
-    public User getUserById(final Long id) { // получение пользователя по id
+    @Override
+    public User getUserById(final int id) { // получение пользователя по id
         log.info("Получение пользователя по id.");
         return userStorage.getUserById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id: " + id + " не найден."));
     }
 
-    public Set<Long> addNewFriend(final Long idUser, final Long idFriend) { //добавление пользователя в друзья
-        getUserById(idUser);
-        getUserById(idFriend);
-        if (idUser.equals(idFriend)) {
+    @Override
+    public void addNewFriend(final int userId, final int friendId) { //добавление пользователя в друзья
+        getUserById(userId);
+        getUserById(friendId);
+        if (userId == friendId) {
             log.warn("Ошибка при добавлении в друзья. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при добавлении в друзья. Id пользователей совпадают.");
         }
-        Set<Long> setFriends = userStorage.addNewFriend(idUser, idFriend);
-        log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}.", idFriend, idUser);
-        return setFriends;
+        userStorage.addNewFriend(userId, friendId);
+        log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}.", friendId, userId);
     }
 
-    public Set<Long> deleteFriend(final Long idUser, final Long idFriend) { // удаление из друзей пользователя
-        getUserById(idUser);
-        getUserById(idFriend);
-        if (idUser.equals(idFriend)) {
+    @Override
+    public void deleteFriend(final int userId, final int friendId) { // удаление из друзей пользователя
+        getUserById(userId);
+        getUserById(friendId);
+        if (userId == friendId) {
             log.warn("Ошибка при удалении пользователя из друзей. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при удалении пользователя из друзей. Id пользователей совпадают.");
         }
-        Set<Long> setFriends = userStorage.deleteFriend(idUser, idFriend);
-        log.info("Пользователь с id {} удален из друзей пользователя с id {}.", idFriend, idUser);
-        return setFriends;
+        userStorage.deleteFriend(userId, friendId);
+        log.info("Пользователь с id {} удален из друзей пользователя с id {}.", friendId, userId);
     }
 
-    public List<User> getAllFriends(final Long idUser) { // получение списка друзей пользователя
-        getUserById(idUser);
-        List<User> listFriends = userStorage.getAllFriends(idUser);
-        log.info("Получение списка друзей пользователя с id {}.", idUser);
+    @Override
+    public List<User> getAllFriends(final int userId) { // получение списка друзей пользователя
+        getUserById(userId);
+        List<User> listFriends = userStorage.getAllFriends(userId);
+        log.info("Получение списка друзей пользователя с id {}.", userId);
         return listFriends;
     }
 
-    public List<User> getCommonFriends(final Long idUser, final Long idOther) { // получение списка общих друзей с пользователем
-        getUserById(idUser);
-        getUserById(idOther);
-        if (idUser.equals(idOther)) {
+    @Override
+    public List<User> getCommonFriends(final int userId, final int otherId) { // получение списка общих друзей с пользователем
+        getUserById(userId);
+        getUserById(otherId);
+        if (userId == otherId) {
             log.warn("Ошибка при получении списка общих друзей. Id пользователей совпадают.");
             throw new ValidationException("Ошибка при получении списка общих друзей. Id пользователей совпадают.");
         }
-        List<User> listFriends = userStorage.getCommonFriends(idUser, idOther);
-        log.info("Получение списка общих друзей у пользователя с id {} и пользователя с id {}.", idOther, idUser);
+        List<User> listFriends = userStorage.getCommonFriends(userId, otherId);
+        log.info("Получение списка общих друзей у пользователя с id {} и пользователя с id {}.", otherId, userId);
         return listFriends;
     }
 

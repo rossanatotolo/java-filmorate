@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -8,10 +7,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-@Slf4j
 public class InMemoryUserStorage implements UserStorage {
-    private final Map<Long, User> users = new HashMap<>();
-    private long currentId = 0;
+    private final Map<Integer, User> users = new HashMap<>();
+    private int currentId = 0;
 
     @Override //получение списка пользователей.
     public Collection<User> getAllUsers() {
@@ -32,44 +30,43 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override // получение пользователя по id
-    public Optional<User> getUserById(final Long id) {
+    public Optional<User> getUserById(final int id) {
         return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public Set<Long> addNewFriend(final Long idUser, final Long idFriend) { //добавление пользователя в друзья
-        final Set<Long> userFriends = users.get(idUser).getFriends();
-        userFriends.add(idFriend);
-        users.get(idFriend).getFriends().add(idUser);
-        return userFriends;
+    public void addNewFriend(final int userId, final int friendId) { //добавление пользователя в друзья
+        final Set<Integer> userFriends = users.get(userId).getFriends();
+        userFriends.add(friendId);
+        users.get(friendId).getFriends().add(userId);
+    }
+
+
+    @Override
+    public void deleteFriend(final int userId, final int friendId) { // удаление из друзей пользователя
+        final Set<Integer> userFriends = users.get(userId).getFriends();
+        userFriends.remove(friendId);
+        users.get(friendId).getFriends().remove(userId);
     }
 
     @Override
-    public Set<Long> deleteFriend(final Long idUser, final Long idFriend) { // удаление из друзей пользователя
-        final Set<Long> userFriends = users.get(idUser).getFriends();
-        userFriends.remove(idFriend);
-        users.get(idFriend).getFriends().remove(idUser);
-        return userFriends;
-    }
-
-    @Override
-    public List<User> getAllFriends(final Long idUser) { // получение списка друзей пользователя
-        return users.get(idUser).getFriends().stream()
+    public List<User> getAllFriends(final int userId) { // получение списка друзей пользователя
+        return users.get(userId).getFriends().stream()
                 .map(users::get)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<User> getCommonFriends(final Long idUser, final Long idOther) { // получение списка общих друзей с пользователем
-        Set<Long> user = users.get(idUser).getFriends();
-        Set<Long> userOther = users.get(idOther).getFriends();
+    public List<User> getCommonFriends(final int userId, final int otherId) { // получение списка общих друзей с пользователем
+        Set<Integer> user = users.get(userId).getFriends();
+        Set<Integer> userOther = users.get(otherId).getFriends();
         return user.stream()
                 .filter(userOther::contains)
                 .map(users::get)
                 .collect(Collectors.toList());
     }
 
-    private long getIdNext() {
+    private Integer getIdNext() {
         return ++currentId;
     }
 }

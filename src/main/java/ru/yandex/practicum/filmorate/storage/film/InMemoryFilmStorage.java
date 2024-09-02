@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> films = new HashMap<>();
-    private long currentId = 0;
+    private final Map<Integer, Film> films = new HashMap<>();
+    private int currentId = 0;
 
     @Override   //получение списка фильмов
     public Collection<Film> getAllFilms() {
@@ -30,31 +30,34 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override //получение фильма по id
-    public Optional<Film> getFilmById(final Long id) {
+    public Optional<Film> getFilmById(final int id) {
         return Optional.ofNullable(films.get(id));
     }
 
     @Override //добавление лайка
-    public Set<Long> addLike(final Long id, final Long idUser) {
-        films.get(id).getLikes().add(idUser);
-        return films.get(id).getLikes();
+    public void addLike(final int id, final int userId) {
+        films.get(id).getLikes().add(userId);
     }
 
     @Override // удаление лайка
-    public Set<Long> deleteLike(final Long id, final Long idUser) {
-        films.get(id).getLikes().remove(idUser);
-        return films.get(id).getLikes();
+    public void deleteLike(final int id, final int userId) {
+        films.get(id).getLikes().remove(userId);
     }
 
     @Override // получение списка лучших фильмов
-    public List<Film> getPopular(final Long count) {
+    public List<Film> getPopular(final int count) {
         return films.values().stream()
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size()).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
-    private long getIdNext() {
+    @Override
+    public List<Integer> getAllId() {
+        return new ArrayList<>(films.keySet());
+    }
+
+    private Integer getIdNext() {
         return ++currentId;
     }
 }

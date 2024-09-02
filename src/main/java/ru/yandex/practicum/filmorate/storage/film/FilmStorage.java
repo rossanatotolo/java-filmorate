@@ -11,13 +11,15 @@ public interface FilmStorage {
 
     Film filmUpdate(Film film); //обновление фильма
 
-    Optional<Film> getFilmById(Long id); //получение фильма по id
+    Optional<Film> getFilmById(int id); //получение фильма по id
 
-    Set<Long> addLike(Long id, Long idUser); //добавление лайка
+    void addLike(int id, int userId); //добавление лайка
 
-    Set<Long> deleteLike(Long id, Long idUser); // удаление лайка
+    void deleteLike(int id, int userId); // удаление лайка
 
-    List<Film> getPopular(Long count); // получение списка лучших фильмов
+    List<Film> getPopular(int count); // получение списка лучших фильмов
+
+    List<Integer> getAllId();
 }
 
 
