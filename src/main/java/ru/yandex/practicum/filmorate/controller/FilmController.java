@@ -41,7 +41,7 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}") //добавление лайка айди.
-    public void addLike(@PathVariable @Positive final int id, @PathVariable @Positive final int userId) {
+    public void addLike(@PathVariable @Positive final int id, @PathVariable final int userId) {
         filmService.addLike(id, userId);
     }
 
