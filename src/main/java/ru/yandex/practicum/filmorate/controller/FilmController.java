@@ -40,12 +40,12 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}") //добавление лайка айди
+    @PutMapping("/{id}/like/{userId}") //добавление лайка айди.
     public void addLike(@PathVariable @Positive final int id, @PathVariable @Positive final int userId) {
         filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}") //удаление лайка по айди
+    @DeleteMapping("/{id}/like/{userId}") //удаление лайка по айди.
     public void deleteLike(@PathVariable @Positive final int id, @PathVariable @Positive final int userId) {
         filmService.deleteLike(id, userId);
     }
