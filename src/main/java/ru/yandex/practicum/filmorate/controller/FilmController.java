@@ -26,7 +26,7 @@ public class FilmController {
 
     @PostMapping() // для добавления нового фильма в список.
     @ResponseStatus(HttpStatus.CREATED)
-    public Film filmCreate(@Valid @RequestBody final Film film) {
+    public Film filmCreate(@Valid @RequestBody final Film film) { // значение, которое будет передано в метод в качестве аргумента, нужно взять из тела запроса
         return filmService.filmCreate(film);
     }
 
@@ -40,20 +40,19 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}") //добавление лайка айди.
-    public void addLike(@PathVariable @Positive final int id, @PathVariable final int userId) {
+    @PutMapping("/{id}/like/{userId}") //добавление лайка
+    public void addLike(@PathVariable @Positive final int id, @PathVariable @Positive final int userId) {
         filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}") //удаление лайка по айди.
+    @DeleteMapping("/{id}/like/{userId}") //удаление лайка
     public void deleteLike(@PathVariable @Positive final int id, @PathVariable @Positive final int userId) {
         filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/popular")  // получение списка лучших фильмов.
+    @GetMapping("/popular")  // получение списка лучших фильмов
     public List<Film> getPopular(@RequestParam(defaultValue = "10") @Positive final int count) {
         return filmService.getPopular(count);
     }
 }
-
 
